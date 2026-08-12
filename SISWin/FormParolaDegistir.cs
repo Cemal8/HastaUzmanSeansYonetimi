@@ -98,7 +98,7 @@ namespace SISWin
             }
             else
             {
-                MessageBox.Show("Parola değiştirilemedi. Lütfen tekrar deneyin.");
+                MessageBox.Show("Parola değiştirilirken bir hata oluştu.");
             }
         }
     }

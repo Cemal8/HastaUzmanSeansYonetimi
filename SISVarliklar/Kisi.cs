@@ -70,6 +70,11 @@ namespace SISVarliklar
                 return string.Format("{0} {1}", ad, soyad);
             }
         }
+
+        public override string ToString()
+        {
+            return GoruntuMetni;
+        }
         #endregion
     }
 }

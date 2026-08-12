@@ -92,7 +92,7 @@ namespace SISApi.Controllers
         {
             try
             {
-                var calisanlar = IS.Calisan.CalisanlariListele(ad, soyad);
+                var calisanlar = IS.Calisan.CalisanlariListele(ad ?? string.Empty, soyad ?? string.Empty);
                 return Ok(calisanlar);
             }
             catch (Exception ex)

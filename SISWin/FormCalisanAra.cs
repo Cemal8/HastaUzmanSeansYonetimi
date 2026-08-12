@@ -17,12 +17,12 @@ namespace SISWin
         public FormCalisanAra()
         {
             InitializeComponent();
+            lstCalisanlar.DisplayMember = "GoruntuMetni";
         }
 
         private async Task CalisanlariListeleAsync()
         {
-            lstCalisanlar.DisplayMember = "GoruntuMetni";
-            lstCalisanlar.DataSource = null; 
+            lstCalisanlar.DataSource = null;
 
             string ad = txtAd.Text.Trim();
             string soyad = txtSoyad.Text.Trim();
@@ -38,6 +38,7 @@ namespace SISWin
                     var calisanlar = await client.GetFromJsonAsync<VAR.Calisan[]>(requestUrl);
 
                     lstCalisanlar.DataSource = calisanlar;
+                    lstCalisanlar.DisplayMember = "GoruntuMetni";
                 }
             }
             catch (Exception ex)

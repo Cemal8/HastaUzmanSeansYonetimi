@@ -128,8 +128,8 @@ namespace SISVeriErisimKatmani
             List<VAR.Calisan> calisanlar=new List<VAR.Calisan>();
 
             Komut k = new Komut(spAdi);
-            k.ParametreEkle("@ad", ad);
-            k.ParametreEkle("@soyad", soyad);
+            k.ParametreEkle("@ad", ad ?? string.Empty);
+            k.ParametreEkle("@soyad", soyad ?? string.Empty);
 
             SqlDataReader sdr = k.IsletReader();
             while (sdr.Read())
@@ -166,29 +166,27 @@ namespace SISVeriErisimKatmani
         public static bool ParolaDegistir(int calisanNo, string yeniParola)
         {
             string spAdi = "prCalisanParolaDegistir";
-            bool sonuc = false;
 
             Komut k = new Komut(spAdi);
             k.ParametreEkle("@calisanNo", calisanNo);
             k.ParametreEkle("@parola", yeniParola);
-            sonuc = k.IsletBool();
+            int etkilenen = k.Islet();
             k.Temizle();
 
-            return sonuc;
+            return etkilenen > 0;
         }
 
         public static bool ParolaSifirla(string ePosta, string parola)
         {
             string spAdi = "prCalisanParolaSifirla";
-            bool sonuc = false;
 
             Komut k = new Komut(spAdi);
             k.ParametreEkle("@ePosta", ePosta);
             k.ParametreEkle("@parola", parola);
-            sonuc = k.IsletBool();
+            int etkilenen = k.Islet();
             k.Temizle();
 
-            return sonuc;
+            return etkilenen > 0;
         }
     }
 }

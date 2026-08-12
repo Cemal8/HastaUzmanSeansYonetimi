@@ -25,11 +25,11 @@ namespace SISApi.Controllers
         }
 
         [HttpGet("listele")]
-        public IActionResult HastalariListele([FromQuery] string ad, [FromQuery] string soyad)
+        public IActionResult HastalariListele([FromQuery] string? ad, [FromQuery] string? soyad)
         {
             try
             {
-                var hastalar = IS.Hasta.HastalariListele(ad, soyad);
+                var hastalar = IS.Hasta.HastalariListele(ad ?? string.Empty, soyad ?? string.Empty);
                 return Ok(hastalar);
             }
             catch (Exception ex)

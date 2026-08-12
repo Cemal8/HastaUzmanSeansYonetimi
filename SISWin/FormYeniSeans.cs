@@ -22,6 +22,28 @@ namespace SISWin
             lblUzman.Text = uzman.GoruntuMetni;
         }
 
+        private DateTime SeansBaslangicZamaniGetir()
+        {
+            return dtpTarih.Value.Date
+                .AddHours(dtpBaslingicSaati.Value.Hour)
+                .AddMinutes(dtpBaslingicSaati.Value.Minute);
+        }
+
+        private DateTime SeansBitisZamaniGetir()
+        {
+            DateTime baslangic = SeansBaslangicZamaniGetir();
+            DateTime bitis = dtpTarih.Value.Date
+                .AddHours(dtpBitisSaati.Value.Hour)
+                .AddMinutes(dtpBitisSaati.Value.Minute);
+
+            if (bitis <= baslangic)
+            {
+                bitis = bitis.AddDays(1);
+            }
+
+            return bitis;
+        }
+
         private bool KullanıcıGirdisiDogrula()
         {
             if (dtpTarih.Value.Date < DateTime.Now.Date)
@@ -32,7 +54,10 @@ namespace SISWin
                 return false;
             }
 
-            if (dtpBitisSaati.Value <= dtpBaslingicSaati.Value.AddMinutes(enKisaSeansSuresi))
+            DateTime baslangic = SeansBaslangicZamaniGetir();
+            DateTime bitis = SeansBitisZamaniGetir();
+
+            if ((bitis - baslangic).TotalMinutes < enKisaSeansSuresi)
             {
                 MessageBox.Show($"Seans süresi en az {enKisaSeansSuresi} dakika olmalıdır.");
                 dtpBitisSaati.Select();

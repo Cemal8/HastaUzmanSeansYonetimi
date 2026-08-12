@@ -115,37 +115,39 @@ namespace SISWin
 
         private async Task BilgileriYukleAsync()
         {
-            if (hasta != null)
+            if (aktifseans != null)
             {
-                lblAd.Text = hasta.Ad;
-                lblAdres.Text = hasta.Adres;
-                lblGsmNo.Text = hasta.CepTel;
-                lblCinsiyet.Text = hasta.Cinsiyet;
-                lblDogumTarihi.Text = hasta.DogumTarihi.ToShortDateString();
-                lblEPosta.Text = hasta.Eposta;
-                lblTelefon.Text = hasta.EvTel;
-                lblSoyad.Text = hasta.Soyad;
-                lblTCKimlikNo.Text = hasta.TcKimlikNo;
+                txtAktifSeansNotu.Text = aktifseans.SeansNotu ?? "";
+            }
 
-                txtAktifSeansNotu.Text = aktifseans?.SeansNotu ?? "";
+            if (hasta == null) return;
 
-                try
+            lblAd.Text = hasta.Ad;
+            lblAdres.Text = hasta.Adres;
+            lblGsmNo.Text = hasta.CepTel;
+            lblCinsiyet.Text = hasta.Cinsiyet;
+            lblDogumTarihi.Text = hasta.DogumTarihi.ToShortDateString();
+            lblEPosta.Text = hasta.Eposta;
+            lblTelefon.Text = hasta.EvTel;
+            lblSoyad.Text = hasta.Soyad;
+            lblTCKimlikNo.Text = hasta.TcKimlikNo;
+
+            try
+            {
+                using (HttpClient client = new HttpClient())
                 {
-                    using (HttpClient client = new HttpClient())
-                    {
-                        client.BaseAddress = new Uri(apiUrl);
+                    client.BaseAddress = new Uri(apiUrl);
 
-                        var hastaSeanslari = await client.GetFromJsonAsync<VAR.Seans[]>($"api/seans/hasta/{hasta.No}/seanslar");
+                    var hastaSeanslari = await client.GetFromJsonAsync<VAR.Seans[]>($"api/seans/hasta/{hasta.No}/seanslar");
 
-                        lstSeanslar.DataSource = hastaSeanslari;
-                        lstSeanslar.DisplayMember = "GoruntuMetni";
-                    }
+                    lstSeanslar.DataSource = hastaSeanslari;
+                    lstSeanslar.DisplayMember = "GoruntuMetni";
                 }
-                catch (Exception ex)
-                {
-                    Yardimci.HataKaydet(ex);
-                    MessageBox.Show("Geçmiş seanslar çekilirken serviste bir hata oluştu!");
-                }
+            }
+            catch (Exception ex)
+            {
+                Yardimci.HataKaydet(ex);
+                MessageBox.Show("Geçmiş seanslar çekilirken serviste bir hata oluştu!");
             }
         }
 
@@ -185,6 +187,18 @@ namespace SISWin
             return sonuc;
         }
 
+        private void SeansSec(int seansNo)
+        {
+            for (int i = 0; i < cbbSeanslar.Items.Count; i++)
+            {
+                if (cbbSeanslar.Items[i] is VAR.Seans seans && seans.No == seansNo)
+                {
+                    cbbSeanslar.SelectedIndex = i;
+                    return;
+                }
+            }
+        }
+
         private async void btnKaydet_Click(object sender, EventArgs e)
         {
             if (aktifseans == null) return;
@@ -198,12 +212,18 @@ namespace SISWin
 
             btnKaydet.Enabled = false;
 
-            bool sonuc = await SeansNotuKaydetAsync(aktifseans.No, txtAktifSeansNotu.Text);
+            int seciliSeansNo = aktifseans.No;
+            string kaydedilenNot = txtAktifSeansNotu.Text.Trim();
+            bool sonuc = await SeansNotuKaydetAsync(seciliSeansNo, kaydedilenNot);
 
             btnKaydet.Enabled = true;
 
             if (sonuc)
             {
+                aktifseans.SeansNotu = kaydedilenNot;
+                await UzmanSeanslariniYukleAsync();
+                SeansSec(seciliSeansNo);
+                txtAktifSeansNotu.Text = kaydedilenNot;
                 MessageBox.Show("Seans notu başarıyla kaydedildi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
@@ -229,14 +249,28 @@ namespace SISWin
 
             btnGüncelle.Enabled = false;
 
-            bool sonuc = await SeansNotuKaydetAsync(gecmisSeans.No, txtGecmisSeansNotu.Text);
+            int seciliSeansNo = gecmisSeans.No;
+            string guncellenenNot = txtGecmisSeansNotu.Text.Trim();
+            bool sonuc = await SeansNotuKaydetAsync(seciliSeansNo, guncellenenNot);
 
             btnGüncelle.Enabled = true;
 
             if (sonuc)
             {
-                MessageBox.Show("Seans notu başarıyla güncellendi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                gecmisSeans.SeansNotu = guncellenenNot;
                 await BilgileriYukleAsync();
+
+                for (int i = 0; i < lstSeanslar.Items.Count; i++)
+                {
+                    if (lstSeanslar.Items[i] is VAR.Seans seans && seans.No == seciliSeansNo)
+                    {
+                        lstSeanslar.SelectedIndex = i;
+                        break;
+                    }
+                }
+
+                txtGecmisSeansNotu.Text = guncellenenNot;
+                MessageBox.Show("Seans notu başarıyla güncellendi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {

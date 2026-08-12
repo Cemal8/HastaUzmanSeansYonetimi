@@ -23,14 +23,14 @@ namespace SISWin
 
         private void FormHastaRandevuYonet_Load(object sender, EventArgs e)
         {
+            lstHastalar.DisplayMember = "GoruntuMetni";
             HastaBilgisiTemizle();
             RandevuBilgisiTemizle();
         }
 
         private async Task HastalariListeleAsync()
         {
-            lstHastalar.DisplayMember = "GoruntuMetni";
-            lstHastalar.DataSource = null; 
+            lstHastalar.DataSource = null;
 
             string ad = txtAd.Text.Trim();
             string soyad = txtSoyad.Text.Trim();
@@ -44,6 +44,7 @@ namespace SISWin
 
                     var hastalar = await client.GetFromJsonAsync<VAR.Hasta[]>(requestUrl);
                     lstHastalar.DataSource = hastalar;
+                    lstHastalar.DisplayMember = "GoruntuMetni";
                 }
             }
             catch (Exception ex)
